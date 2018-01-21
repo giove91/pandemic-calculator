@@ -22,14 +22,23 @@
                 <tr>
                     <th>colore</th>
                     <th>City</th>
-                    <th>Next</th>
+                    <th>1 turn</th>
+                    <th>2 turn</th>
+                    <th>3 turn</th>
+                    <th>4 turn</th>
                 </tr>
                 <tr ng-repeat="x in cities">
                     <td>{{ x.color }}</td>
-                    <td>{{ x.name }}</td>
-                    <td>{{ (next[x.name]*100).toFixed(1) }}</td>
+		    <td><button type="button" ng-click="clickcity(x.name)">{{ x.name }}</button></td>
+                    <td>{{ (state.Query(1*infectrate)[x.name]*100).toFixed(1) }}</td>
+                    <td>{{ (state.Query(2*infectrate)[x.name]*100).toFixed(1) }}</td>
+                    <td>{{ (state.Query(3*infectrate)[x.name]*100).toFixed(1) }}</td>
+                    <td>{{ (state.Query(4*infectrate)[x.name]*100).toFixed(1) }}</td>
                 </tr>
             </table>
+	    <input type="checkbox" ng-model="epidemic">Epidemic mode</input>
+	    <input type="number" ng-model="infectrate"></input>Infection rate
+	    <!--	    <button type="button" ng-click="">Undo (once)</button>-->
         </div>
     </body>
 </html>

@@ -95,8 +95,25 @@ app.controller('calculator', function($scope, $http) {
         function (response) {
             $scope.cities = response.data;
             $scope.state = new State($scope.cities);
+//		$scope.lastState = JSON.parse(JSON.stringify($scope.state);
             $scope.next = $scope.state.Query(1);
             console.log($scope.next);
+		$scope.epidemic = false;
+		$scope.clickcity = function (city) {
+			if ($scope.epidemic) {
+//				$scope.lastState = JSON.parse(JSON.stringify($scope.state);
+				$scope.state.Epidemic(city);
+				$scope.epidemic = false;
+			}
+			else {
+//				$scope.lastState = JSON.parse(JSON.stringify($scope.state);
+				$scope.state.Infect(city);
+			}
+		};
+		$scope.infectrate = 2;
+		/*$scope.undo = function () {
+			$scope.state = JSON.parse(JSON.stringify($scope.lastState));
+		};*/
         });
 });
 //mystate = new State(cities);
