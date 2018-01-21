@@ -1,8 +1,35 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
         <script src="calc.js"></script>
     </head>
     <body>
+        <!-- <div>Infect:
+            <select name="infect">
+                <option value="a">a</option>
+            </select>
+            <button type="button">Go</button>
+        </div>
+        <div>Epidemic:
+            <select name="infect">
+                <option value="a">a</option>
+            </select>
+            <button type="button">Go</button>
+        </div> -->
+        <div ng-app="pandemic" ng-controller="calculator">
+            <table>
+                <tr>
+                    <th>colore</th>
+                    <th>City</th>
+                    <th>Next</th>
+                </tr>
+                <tr ng-repeat="x in cities">
+                    <td>{{ x.color }}</td>
+                    <td>{{ x.name }}</td>
+                    <td>{{ (next[x.name]*100).toFixed(1) }}</td>
+                </tr>
+            </table>
+        </div>
     </body>
 </html>

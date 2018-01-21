@@ -10,10 +10,15 @@ function State(cities) {
     var i, j;
     this.discard = [];
     this.deck = [[]];
-    this.cities = cities.map(function (c) {return c.name; });
+	this.cities = [];
+//    this.cities = cities.map(function (c) {return c.name; });
+	console.log(cities);
+	console.log(this.cities);
     for (i = 0; i < cities.length; i++) {
-        for (j = 0; j < cities[i].occurrence; j++) {
+	this.cities.push(cities[i].name);
+        for (j = 0; j < cities[i].multiplicity; j++) {
             this.deck[0].push(cities[i].name);
+		console.log(cities[i].name);
         }
     }
     this.Infect = function (city) {
@@ -44,26 +49,31 @@ function State(cities) {
     this.Query = function (cards) {
         var i, j, expValues = {};
         for (i = 0; i < cities.length; i++) {
-            expValues[cities[i]] = 0;
+            expValues[cities[i].name] = 0;
         }
         j = this.deck.length - 1;
+	console.log(this);
+	console.log(j);
         while (cards > this.deck[j].length) {
             cards -= this.deck[j].length;
             for (i = 0; i < this.deck[j].length; i++) {
                 expValues[this.deck[j][i]]++;
             }
-            j--;
             if (j < 0) {
                 return "too many cards";
             }
+            j--;
         }
+        console.log(expValues);
         for (i = 0; i < this.deck[j].length; i++) {
             expValues[this.deck[j][i]] += 1.*cards/this.deck[j].length;
         }
+        console.log(expValues);
+        return expValues;
     };
 }
-var mystate;
-
+var app = angular.module('pandemic',[]);;
+/*
 function httpGetAsync(theUrl, callback)
 {
     var xmlHttp = new XMLHttpRequest();
@@ -75,11 +85,22 @@ function httpGetAsync(theUrl, callback)
     xmlHttp.send(null);
 }
 
-httpGetAsync('https://uz.sns.it/~giove/pandemic/',
+httpGetAsync('https://uz.sns.it/~giove/pandemic/deck/',
             function (data) {
-    var cities = JSON.parse(data);
+    cities = JSON.parse(data);
     console.log(cities);
+});*/
+app.controller('calculator', function($scope, $http) {
+    $http.get('https://uz.sns.it/~giove/pandemic/deck/').then(
+        function (response) {
+            $scope.cities = response.data;
+            $scope.state = new State($scope.cities);
+            $scope.next = $scope.state.Query(1);
+            console.log($scope.next);
+        });
 });
+//mystate = new State(cities);
+
 /*
 mystate.Infect("New York");
 mystate.Infect("New York");
