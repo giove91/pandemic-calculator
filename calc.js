@@ -1,9 +1,10 @@
 'use strict';
-var cities = [
+/* var cities = [
     {"name": "New York", "occurrence": 3, "color": "blue"},
     {"name": "London", "occurrence": 3, "color": "blue"},
     {"name": "Buenos Aires", "occurrence": 2, "color": "yellow"}
-];
+];*/
+
 
 function State(cities) {
     var i, j;
@@ -40,9 +41,46 @@ function State(cities) {
         this.deck.push(this.discard);
         this.discard = [];
     };
+    this.Query = function (cards) {
+        var i, j, expValues = {};
+        for (i = 0; i < cities.length; i++) {
+            expValues[cities[i]] = 0;
+        }
+        j = this.deck.length - 1;
+        while (cards > this.deck[j].length) {
+            cards -= this.deck[j].length;
+            for (i = 0; i < this.deck[j].length; i++) {
+                expValues[this.deck[j][i]]++;
+            }
+            j--;
+            if (j < 0) {
+                return "too many cards";
+            }
+        }
+        for (i = 0; i < this.deck[j].length; i++) {
+            expValues[this.deck[j][i]] += 1.*cards/this.deck[j].length;
+        }
+    };
+}
+var mystate;
+
+function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.send(null);
 }
 
-var mystate = new State(cities);
+httpGetAsync('https://uz.sns.it/~giove/pandemic/',
+            function (data) {
+    var cities = JSON.parse(data);
+    console.log(cities);
+});
+/*
 mystate.Infect("New York");
 mystate.Infect("New York");
 mystate.Infect("Buones Aires");
@@ -51,3 +89,4 @@ mystate.Infect("London");
 mystate.Epidemic("London");
 console.log(mystate);
 //console.log(JSON.stringify(mystate));
+*/
