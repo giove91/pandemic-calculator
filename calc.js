@@ -11,14 +11,10 @@ function State(cities) {
     this.discard = [];
     this.deck = [[]];
 	this.cities = [];
-//    this.cities = cities.map(function (c) {return c.name; });
-	console.log(cities);
-	console.log(this.cities);
     for (i = 0; i < cities.length; i++) {
 	this.cities.push(cities[i].name);
         for (j = 0; j < cities[i].multiplicity; j++) {
             this.deck[0].push(cities[i].name);
-		console.log(cities[i].name);
         }
     }
     this.Infect = function (city) {
@@ -52,8 +48,6 @@ function State(cities) {
             expValues[cities[i].name] = 0;
         }
         j = this.deck.length - 1;
-	console.log(this);
-	console.log(j);
         while (cards > this.deck[j].length) {
             cards -= this.deck[j].length;
             for (i = 0; i < this.deck[j].length; i++) {
@@ -64,11 +58,9 @@ function State(cities) {
             }
             j--;
         }
-        console.log(expValues);
         for (i = 0; i < this.deck[j].length; i++) {
             expValues[this.deck[j][i]] += 1.*cards/this.deck[j].length;
         }
-        console.log(expValues);
         return expValues;
     };
 }
@@ -95,26 +87,29 @@ app.controller('calculator', function($scope, $http) {
         function (response) {
             $scope.cities = response.data;
             $scope.state = new State($scope.cities);
-//		$scope.lastState = JSON.parse(JSON.stringify($scope.state);
+			$scope.histd = [];
+			$scope.hists = [];
             $scope.next = $scope.state.Query(1);
             console.log($scope.next);
-		$scope.epidemic = false;
-		$scope.clickcity = function (city) {
-			if ($scope.epidemic) {
-//				$scope.lastState = JSON.parse(JSON.stringify($scope.state);
-				$scope.state.Epidemic(city);
-				$scope.epidemic = false;
-			}
-			else {
-//				$scope.lastState = JSON.parse(JSON.stringify($scope.state);
-				$scope.state.Infect(city);
-			}
-		};
-		$scope.infectrate = 2;
-		/*$scope.undo = function () {
-			$scope.state = JSON.parse(JSON.stringify($scope.lastState));
-		};*/
-        });
+			$scope.epidemic = false;
+			$scope.clickcity = function (city) {
+				$scope.histd.push(JSON.stringify($scope.state.deck));
+				$scope.hists.push(JSON.stringify($scope.state.discard));
+				if ($scope.epidemic) {
+					$scope.state.Epidemic(city);
+					$scope.epidemic = false;
+				}
+				else {
+					$scope.state.Infect(city);
+				}
+			};
+			$scope.infectrate = 2;
+			$scope.undo = function () {
+				$scope.state.deck = JSON.parse($scope.histd.pop());
+				$scope.state.discard = JSON.parse($scope.hists.pop());
+				console.log($scope.hist);
+			};
+		});
 });
 //mystate = new State(cities);
 

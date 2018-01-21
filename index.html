@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -30,15 +31,18 @@
                 <tr ng-repeat="x in cities">
                     <td>{{ x.color }}</td>
 		    <td><button type="button" ng-click="clickcity(x.name)">{{ x.name }}</button></td>
-                    <td>{{ (state.Query(1*infectrate)[x.name]*100).toFixed(1) }}</td>
-                    <td>{{ (state.Query(2*infectrate)[x.name]*100).toFixed(1) }}</td>
-                    <td>{{ (state.Query(3*infectrate)[x.name]*100).toFixed(1) }}</td>
-                    <td>{{ (state.Query(4*infectrate)[x.name]*100).toFixed(1) }}</td>
+                    <td>{{ (state.Query(1*infectrate)[x.name]).toFixed(2) }}</td>
+                    <td>{{ (state.Query(2*infectrate)[x.name]).toFixed(2) }}</td>
+                    <td>{{ (state.Query(3*infectrate)[x.name]).toFixed(2) }}</td>
+                    <td>{{ (state.Query(4*infectrate)[x.name]).toFixed(2) }}</td>
                 </tr>
             </table>
 	    <input type="checkbox" ng-model="epidemic">Epidemic mode</input>
 	    <input type="number" ng-model="infectrate"></input>Infection rate
-	    <!--	    <button type="button" ng-click="">Undo (once)</button>-->
+	    <button type="button" ng-click="undo()">Undo</button>
+		<div ng-repeat="l in state.deck">
+			<p>{{ l.length }} {{ l.toString() }}</p>
+		</div>
         </div>
     </body>
 </html>
