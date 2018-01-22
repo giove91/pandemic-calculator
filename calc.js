@@ -33,29 +33,41 @@ function State(cities) {
             this.deck.shift();
         }
         this.discard.push(city);
+        this.discard.sort();
         this.deck.push(this.discard);
         this.discard = [];
     };
-    this.Query = function (cards) {
-        var i, j, expValues = {};
-        for (i = 0; i < cities.length; i++) {
-            expValues[cities[i].name] = 0;
-        }
-        j = this.deck.length - 1;
-        while (cards > this.deck[j].length) {
+    this.GetStackIndexAndRemainder = function (cards) {
+        var j = this.deck.length - 1;
+        while (cards > this.deck[j].length && j >= 0) {
             cards -= this.deck[j].length;
-            for (i = 0; i < this.deck[j].length; i++) {
-                expValues[this.deck[j][i]]++;
-            }
-            if (j < 0) {
-                return "too many cards";
-            }
             j--;
         }
-        for (i = 0; i < this.deck[j].length; i++) {
-            expValues[this.deck[j][i]] += cards / this.deck[j].length;
+        return {'index': j, 'remainder': cards};
+    };
+    this.GetCityOdds = function (cards, city, times) {
+        var i,
+            min = 0,
+            dev = 0,
+            oppOdds = 0,
+            indRem = this.GetStackIndexAndRemainder(cards),
+            rim = this.deck[indRem.index].length;
+        for (i = indRem.index + 1; i < this.deck.length; i++) {
+            this.deck[i].forEach(function (item, index) {
+               if (item === city) { min++; }
+            });
         }
-        return expValues;
+        if (times <= min) {
+            return 1;
+        }
+        times -= min;
+        this.deck[indRem.index].forEach(function (item, index) {
+            if (item === city) { dev++; }
+        });
+        for (i = 0; i < times; i++) {
+            oppOdds += binom.get(dev, i) * binom.get(rim - dev, indRem.remainder - i);
+        }
+        return 1 - oppOdds / binom.get(rim, indRem.remainder);
     };
 }
 var app = angular.module('pandemic', []);
@@ -68,7 +80,6 @@ app.controller('calculator', function ($scope, $http) {
             $scope.histd = [];
             $scope.hists = [];
             $scope.next = $scope.state.Query(1);
-            console.log($scope.next);
             $scope.epidemic = false;
             $scope.clickcity = function (city) {
                 $scope.histd.push(JSON.stringify($scope.state.deck));
@@ -84,7 +95,6 @@ app.controller('calculator', function ($scope, $http) {
             $scope.undo = function () {
                 $scope.state.deck = JSON.parse($scope.histd.pop());
                 $scope.state.discard = JSON.parse($scope.hists.pop());
-                console.log($scope.hist);
             };
         }
     );

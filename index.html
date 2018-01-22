@@ -3,6 +3,7 @@
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
         <script src="calc.js"></script>
+        <script src="binomial.js"></script>
     </head>
     <body>
         <h1>Pandemic calculator</h1>
@@ -11,6 +12,16 @@
                 <tr>
                     <th>&nbsp;</th>
                     <th>City</th>
+                    <th colspan="4">at least 1</th>
+                    <th colspan="4">at least 2</th>
+                </tr>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>1 turn</th>
+                    <th>2 turn</th>
+                    <th>3 turn</th>
+                    <th>4 turn</th>
                     <th>1 turn</th>
                     <th>2 turn</th>
                     <th>3 turn</th>
@@ -23,10 +34,14 @@
                             {{ x.name }}
                         </button>
                     </td>
-                    <td>{{ (state.Query(1*infectrate)[x.name]).toFixed(2) }}</td>
-                    <td>{{ (state.Query(2*infectrate)[x.name]).toFixed(2) }}</td>
-                    <td>{{ (state.Query(3*infectrate)[x.name]).toFixed(2) }}</td>
-                    <td>{{ (state.Query(4*infectrate)[x.name]).toFixed(2) }}</td>
+                    <td>{{ (state.GetCityOdds(1*infectrate, x.name, 1)).toFixed(2) }}</td>
+                    <td>{{ (state.GetCityOdds(2*infectrate, x.name, 1)).toFixed(2) }}</td>
+                    <td>{{ (state.GetCityOdds(3*infectrate, x.name, 1)).toFixed(2) }}</td>
+                    <td>{{ (state.GetCityOdds(4*infectrate, x.name, 1)).toFixed(2) }}</td>
+                    <td>{{ (state.GetCityOdds(1*infectrate, x.name, 2)).toFixed(2) }}</td>
+                    <td>{{ (state.GetCityOdds(2*infectrate, x.name, 2)).toFixed(2) }}</td>
+                    <td>{{ (state.GetCityOdds(3*infectrate, x.name, 2)).toFixed(2) }}</td>
+                    <td>{{ (state.GetCityOdds(4*infectrate, x.name, 2)).toFixed(2) }}</td>
                 </tr>
             </table>
             <input type="checkbox" ng-model="epidemic"/>Epidemic mode
