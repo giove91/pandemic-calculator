@@ -1,18 +1,12 @@
 'use strict';
-/* var cities = [
-    {"name": "New York", "occurrence": 3, "color": "blue"},
-    {"name": "London", "occurrence": 3, "color": "blue"},
-    {"name": "Buenos Aires", "occurrence": 2, "color": "yellow"}
-];*/
-
 
 function State(cities) {
     var i, j;
     this.discard = [];
     this.deck = [[]];
-	this.cities = [];
+    this.cities = [];
     for (i = 0; i < cities.length; i++) {
-	this.cities.push(cities[i].name);
+        this.cities.push(cities[i].name);
         for (j = 0; j < cities[i].multiplicity; j++) {
             this.deck[0].push(cities[i].name);
         }
@@ -59,67 +53,40 @@ function State(cities) {
             j--;
         }
         for (i = 0; i < this.deck[j].length; i++) {
-            expValues[this.deck[j][i]] += 1.*cards/this.deck[j].length;
+            expValues[this.deck[j][i]] += cards / this.deck[j].length;
         }
         return expValues;
     };
 }
-var app = angular.module('pandemic',[]);;
-/*
-function httpGetAsync(theUrl, callback)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() { 
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
-    }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-    xmlHttp.send(null);
-}
+var app = angular.module('pandemic', []);
 
-httpGetAsync('https://uz.sns.it/~giove/pandemic/deck/',
-            function (data) {
-    cities = JSON.parse(data);
-    console.log(cities);
-});*/
-app.controller('calculator', function($scope, $http) {
+app.controller('calculator', function ($scope, $http) {
     $http.get('https://uz.sns.it/~giove/pandemic/deck/').then(
         function (response) {
             $scope.cities = response.data;
             $scope.state = new State($scope.cities);
-			$scope.histd = [];
-			$scope.hists = [];
+            $scope.histd = [];
+            $scope.hists = [];
             $scope.next = $scope.state.Query(1);
             console.log($scope.next);
-			$scope.epidemic = false;
-			$scope.clickcity = function (city) {
-				$scope.histd.push(JSON.stringify($scope.state.deck));
-				$scope.hists.push(JSON.stringify($scope.state.discard));
-				if ($scope.epidemic) {
-					$scope.state.Epidemic(city);
-					$scope.epidemic = false;
-				}
-				else {
-					$scope.state.Infect(city);
-				}
-			};
-			$scope.infectrate = 2;
-			$scope.undo = function () {
-				$scope.state.deck = JSON.parse($scope.histd.pop());
-				$scope.state.discard = JSON.parse($scope.hists.pop());
-				console.log($scope.hist);
-			};
-		});
+            $scope.epidemic = false;
+            $scope.clickcity = function (city) {
+                $scope.histd.push(JSON.stringify($scope.state.deck));
+                $scope.hists.push(JSON.stringify($scope.state.discard));
+                if ($scope.epidemic) {
+                    $scope.state.Epidemic(city);
+                    $scope.epidemic = false;
+                } else {
+                    $scope.state.Infect(city);
+                }
+            };
+            $scope.infectrate = 2;
+            $scope.undo = function () {
+                $scope.state.deck = JSON.parse($scope.histd.pop());
+                $scope.state.discard = JSON.parse($scope.hists.pop());
+                console.log($scope.hist);
+            };
+        }
+    );
 });
-//mystate = new State(cities);
 
-/*
-mystate.Infect("New York");
-mystate.Infect("New York");
-mystate.Infect("Buones Aires");
-mystate.Epidemic("London");
-mystate.Infect("London");
-mystate.Epidemic("London");
-console.log(mystate);
-//console.log(JSON.stringify(mystate));
-*/

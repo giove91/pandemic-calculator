@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -6,22 +5,11 @@
         <script src="calc.js"></script>
     </head>
     <body>
-        <!-- <div>Infect:
-            <select name="infect">
-                <option value="a">a</option>
-            </select>
-            <button type="button">Go</button>
-        </div>
-        <div>Epidemic:
-            <select name="infect">
-                <option value="a">a</option>
-            </select>
-            <button type="button">Go</button>
-        </div> -->
+        <h1>Pandemic calculator</h1>
         <div ng-app="pandemic" ng-controller="calculator">
             <table>
                 <tr>
-                    <th>colore</th>
+                    <th>&nbsp;</th>
                     <th>City</th>
                     <th>1 turn</th>
                     <th>2 turn</th>
@@ -30,19 +18,23 @@
                 </tr>
                 <tr ng-repeat="x in cities">
                     <td>{{ x.color }}</td>
-		    <td><button type="button" ng-click="clickcity(x.name)">{{ x.name }}</button></td>
+                    <td>
+                        <button type="button" ng-click="clickcity(x.name)">
+                            {{ x.name }}
+                        </button>
+                    </td>
                     <td>{{ (state.Query(1*infectrate)[x.name]).toFixed(2) }}</td>
                     <td>{{ (state.Query(2*infectrate)[x.name]).toFixed(2) }}</td>
                     <td>{{ (state.Query(3*infectrate)[x.name]).toFixed(2) }}</td>
                     <td>{{ (state.Query(4*infectrate)[x.name]).toFixed(2) }}</td>
                 </tr>
             </table>
-	    <input type="checkbox" ng-model="epidemic">Epidemic mode</input>
-	    <input type="number" ng-model="infectrate"></input>Infection rate
-	    <button type="button" ng-click="undo()">Undo</button>
-		<div ng-repeat="l in state.deck">
-			<p>{{ l.length }} {{ l.toString() }}</p>
-		</div>
+            <input type="checkbox" ng-model="epidemic"/>Epidemic mode
+            <input type="number" ng-model="infectrate"/>Infection rate
+            <button type="button" ng-click="undo()">Undo</button>
+            <div ng-repeat="l in state.deck">
+                <p>{{ l.length }} {{ l.toString() }}</p>
+            </div>
         </div>
     </body>
 </html>
