@@ -10,46 +10,48 @@
         <div ng-app="pandemic" ng-controller="calculator">
             <table>
                 <tr>
-                    <th>&nbsp;</th>
-                    <th>City</th>
+                    <th ng-click="orderParameter = name">City</th>
                     <th colspan="4">at least 1</th>
                     <th colspan="4">at least 2</th>
                 </tr>
                 <tr>
                     <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    <th>1 turn</th>
-                    <th>2 turn</th>
-                    <th>3 turn</th>
-                    <th>4 turn</th>
-                    <th>1 turn</th>
-                    <th>2 turn</th>
-                    <th>3 turn</th>
-                    <th>4 turn</th>
+                    <th ng-click="orderParameter = {atleast: 1, turns: 1}">1 turn</th>
+                    <th ng-click="orderParameter = {atleast: 1, turns: 2}">2 turn</th>
+                    <th ng-click="orderParameter = {atleast: 1, turns: 3}">3 turn</th>
+                    <th ng-click="orderParameter = {atleast: 1, turns: 4}">4 turn</th>
+                    <th ng-click="orderParameter = {atleast: 2, turns: 1}">1 turn</th>
+                    <th ng-click="orderParameter = {atleast: 2, turns: 2}">2 turn</th>
+                    <th ng-click="orderParameter = {atleast: 2, turns: 3}">3 turn</th>
+                    <th ng-click="orderParameter = {atleast: 2, turns: 4}">4 turn</th>
                 </tr>
-                <tr ng-repeat="x in cities">
-                    <td>{{ x.color }}</td>
+                <tr ng-repeat="x in cities | orderBy:OrderTable">
                     <td>
-                        <button type="button" ng-click="clickcity(x.name)">
+                        <button type="button" ng-click="ClickCity(x.name)">
                             {{ x.name }}
                         </button>
                     </td>
-                    <td>{{ (state.GetCityOdds(1*infectrate, x.name, 1)).toFixed(2) }}</td>
-                    <td>{{ (state.GetCityOdds(2*infectrate, x.name, 1)).toFixed(2) }}</td>
-                    <td>{{ (state.GetCityOdds(3*infectrate, x.name, 1)).toFixed(2) }}</td>
-                    <td>{{ (state.GetCityOdds(4*infectrate, x.name, 1)).toFixed(2) }}</td>
-                    <td>{{ (state.GetCityOdds(1*infectrate, x.name, 2)).toFixed(2) }}</td>
-                    <td>{{ (state.GetCityOdds(2*infectrate, x.name, 2)).toFixed(2) }}</td>
-                    <td>{{ (state.GetCityOdds(3*infectrate, x.name, 2)).toFixed(2) }}</td>
-                    <td>{{ (state.GetCityOdds(4*infectrate, x.name, 2)).toFixed(2) }}</td>
+                    <td>{{ GetGrid(1,1,x.name) }}</td>
+                    <td>{{ GetGrid(2,1,x.name) }}</td>
+                    <td>{{ GetGrid(3,1,x.name) }}</td>
+                    <td>{{ GetGrid(4,1,x.name) }}</td>
+                    <td>{{ GetGrid(1,2,x.name) }}</td>
+                    <td>{{ GetGrid(2,2,x.name) }}</td>
+                    <td>{{ GetGrid(3,2,x.name) }}</td>
+                    <td>{{ GetGrid(4,2,x.name) }}</td>
                 </tr>
             </table>
             <input type="checkbox" ng-model="epidemic"/>Epidemic mode
-            <input type="number" ng-model="infectrate"/>Infection rate
             <button type="button" ng-click="undo()">Undo</button>
+            <input type="number" ng-model="playercards" ng-change="updateplayerdeck()"/>Player cards (without epidemic)
+            <input type="number" ng-model="epidemiccards" ng-change="updateplayerdeck()"/>Epidemic cards
             <div ng-repeat="l in state.deck">
                 <p>{{ l.length }} {{ l.toString() }}</p>
             </div>
+            <p>infectRate: {{ state.infectRate }}</p>
+            <p>playerDeck: {{ state.playerDeck }}</p>
+            <p>isThereEpidemic: {{ state.isThereEpidemic }}</p>
+            <p>toInfect: {{ state.toInfect }}</p>
         </div>
     </body>
 </html>
