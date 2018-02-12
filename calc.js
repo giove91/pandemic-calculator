@@ -86,6 +86,17 @@ function State(cities) {
         }
         return 1 - oppOdds / binom.get(rim, indRem.remainder);
     };
+    this.GetEpidemicCityOdds = function (cards, city, times) {
+        return 0;
+    }
+    this.GetEpidemicOdds = function () {
+        var playerCards = 2;
+        if (this.isThereEpidemic)
+            return 2 / Math.max(this.playerDeck[0],2);
+        if (! this.isThereEpidemic && this.playerDeck[0] >= 2)
+            return 0;
+        return 1 / this.playerDeck[1];
+    }
     this.InitPlayerDeck = function (playerCards, epidemicCards) {
         var stack;
         this.playerDeck = [];
