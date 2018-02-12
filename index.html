@@ -13,64 +13,81 @@
     </head>
     <body>
         <div class="container-fluid">
-            <h1 class="mt-4 mb-4">Pandemic calculator</h1>
-            <div ng-app="pandemic" ng-controller="calculator">
-                <table class="table table-sm table-hover">
-                    <thead>
-                    <tr>
-                        <th>&nbsp;</th>
-                        <th>City</th>
-                        <th colspan="4">at least 1</th>
-                        <th colspan="4">at least 2</th>
-                    </tr>
-                    <tr>
-                        <th>&nbsp;</th>
-                        <th>&nbsp;</th>
-                        <th>1 turn</th>
-                        <th>2 turn</th>
-                        <th>3 turn</th>
-                        <th>4 turn</th>
-                        <th>1 turn</th>
-                        <th>2 turn</th>
-                        <th>3 turn</th>
-                        <th>4 turn</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="x in cities" ng-class="{
-                        'table-primary': x.color=='blue',
-                        'table-secondary': x.color=='black',
-                        'table-danger': x.color=='red',
-                        'table-warning': x.color=='yellow'}">
-                        <td>{{ x.color }}</td>
-                        <td>
-                            <button type="button" ng-click="clickcity(x.name)">
-                                {{ x.name }}
-                            </button>
-                        </td>
-                        <td>{{ (state.GetCityOdds(1*infectrate, x.name, 1)).toFixed(2) }}</td>
-                        <td>{{ (state.GetCityOdds(2*infectrate, x.name, 1)).toFixed(2) }}</td>
-                        <td>{{ (state.GetCityOdds(3*infectrate, x.name, 1)).toFixed(2) }}</td>
-                        <td>{{ (state.GetCityOdds(4*infectrate, x.name, 1)).toFixed(2) }}</td>
-                        <td>{{ (state.GetCityOdds(1*infectrate, x.name, 2)).toFixed(2) }}</td>
-                        <td>{{ (state.GetCityOdds(2*infectrate, x.name, 2)).toFixed(2) }}</td>
-                        <td>{{ (state.GetCityOdds(3*infectrate, x.name, 2)).toFixed(2) }}</td>
-                        <td>{{ (state.GetCityOdds(4*infectrate, x.name, 2)).toFixed(2) }}</td>
-                    </tr>
-                    </tbody>
-                </table>
-                
+        <h1 class="mt-4 mb-4">Pandemic calculator</h1>
+        <div ng-app="pandemic" ng-controller="calculator">
+            <table class="table table-sm table-hover text-center">
+                <tr>
+                    <th ng-click="orderParameter = name">City</th>
+                    <th colspan="4">at least 1</th>
+                    <th colspan="4">at least 2</th>
+                    <th>Epidemic ({{ state.GetEpidemicOdds().toFixed(2) }} chance)</th>
+                </tr>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th ng-click="orderParameter = {atleast: 1, turns: 1}">1 turn</th>
+                    <th ng-click="orderParameter = {atleast: 1, turns: 2}">2 turn</th>
+                    <th ng-click="orderParameter = {atleast: 1, turns: 3}">3 turn</th>
+                    <th ng-click="orderParameter = {atleast: 1, turns: 4}">4 turn</th>
+                    <th ng-click="orderParameter = {atleast: 2, turns: 1}">1 turn</th>
+                    <th ng-click="orderParameter = {atleast: 2, turns: 2}">2 turn</th>
+                    <th ng-click="orderParameter = {atleast: 2, turns: 3}">3 turn</th>
+                    <th ng-click="orderParameter = {atleast: 2, turns: 4}">4 turn</th>
+                </tr>
+                <tr ng-repeat="x in cities | orderBy:OrderTable"
+                    ng-class="{ 'table-primary': x.color=='blue',
+                                'table-secondary': x.color=='black',
+                                'table-danger': x.color=='red',
+                                'table-warning': x.color=='yellow' }">
+                    <td>
+                        <button type="button" ng-click="ClickCity(x.name)" class="btn btn-sm btn-outline-dark btn-block">
+                            {{ x.name }}
+                        </button>
+                    </td>
+                    <td>{{ GetGrid(1,1,x.name) }}</td>
+                    <td>{{ GetGrid(2,1,x.name) }}</td>
+                    <td>{{ GetGrid(3,1,x.name) }}</td>
+                    <td>{{ GetGrid(4,1,x.name) }}</td>
+                    <td>{{ GetGrid(1,2,x.name) }}</td>
+                    <td>{{ GetGrid(2,2,x.name) }}</td>
+                    <td>{{ GetGrid(3,2,x.name) }}</td>
+                    <td>{{ GetGrid(4,2,x.name) }}</td>
+                </tr>
+            </table>
+            
+            <div class="form-row">
+                <div class="col-auto">
                 <div class="form-check">
                     <input type="checkbox" ng-model="epidemic" class="form-check-input" />
                     <label class="form-check-label">Epidemic mode</label>
                 </div>
+                </div>
                 
-                <input type="number" ng-model="infectrate"/>Infection rate
-                <button type="button" ng-click="undo()">Undo</button>
-                <div ng-repeat="l in state.deck">
-                    <p>{{ l.length }} {{ l.toString() }}</p>
+                <div class="col-auto">
+                <button type="button" ng-click="undo()" class="btn btn-info">Undo</button>
+                </div>
+                
+                <div class="col-auto">
+                <div class="form-group">
+                    <input type="number" ng-model="playercards" ng-change="updateplayerdeck()" class="form-control"/>
+                    <label>Player cards (without epidemic)</label>
+                </div>
+                </div>
+                
+                <div class="col-auto">
+                <div class="form-group">
+                    <input type="number" ng-model="epidemiccards" ng-change="updateplayerdeck()" class="form-control"/>
+                    <label>Epidemic cards</label>
+                </div>
                 </div>
             </div>
+            
+            <div ng-repeat="l in state.deck">
+                <p>{{ l.length }} {{ l.toString() }}</p>
+            </div>
+            <p>infectRate: {{ state.infectRate }}</p>
+            <p>playerDeck: {{ state.playerDeck }}</p>
+            <p>isThereEpidemic: {{ state.isThereEpidemic }}</p>
+            <p>toInfect: {{ state.toInfect }}</p>
         </div>
         
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
