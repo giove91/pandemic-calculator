@@ -81,9 +81,14 @@
                 </div>
             </div>
             
-            <div ng-repeat="l in state.deck">
-                <p>{{ l.length }} {{ l.toString() }}</p>
-            </div>
+            <h4>Infection deck</h4>
+            <table class="table table-sm mb-0">
+                <tr ng-repeat="l in state.deck">
+                    <td>{{ l.length }}</td><td>{{ l.join(', ') }}</td>
+                </tr>
+            </table>
+            <hr class="mt-0"/>
+            
             <p>infectRate: {{ state.infectRate }}</p>
             <p>playerDeck: {{ state.playerDeck }}</p>
             <p>isThereEpidemic: {{ state.isThereEpidemic }}</p>
