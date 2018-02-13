@@ -4,6 +4,7 @@ function State(cities) {
     var i, j;
     this.discard = [];
     this.deck = [[]];
+    this.infectCards = 0;
     this.cities = [];
     this.playerDeck = [];
     this.infectRate = [2, 2, 2, 3, 3, 4, 4];
@@ -14,6 +15,7 @@ function State(cities) {
         for (j = 0; j < cities[i].multiplicity; j++) {
             this.deck[0].push(cities[i].name);
         }
+        this.infectCards = this.deck[0].length;
     }
     this.Infect = function (city) {
         var lastStack = this.deck.length - 1,
@@ -96,20 +98,125 @@ function State(cities) {
         }
         return 1 - oppOdds / binom.get(rim, indRem.remainder);
     };
-    this.GetEpidemicCityOdds = function (cards, city, times) {
-        return 0;
+    this.GetCityOddsNever = function (city, draws) {
+        var i,
+            bad = 0,
+            indRem = this.GetStackIndexAndRemainder(draws),
+            dubts = this.deck[indRem.index].length;
+        for (i = indRem.index + 1; i < this.deck.length; i++) {
+            if (this.deck[i].indexOf(city) > -1)
+                return 0;
+        }
+        this.deck[indRem.index].forEach(function (item) {
+            if (item === city) { bad++; }
+        });
+        return binom.get(dubts - bad, indRem.remainder) / binom.get(dubts, indRem.remainder);
     }
-    this.GetEpidemicOdds = function () {
-        var playerCards = 2;
-        if (this.isThereEpidemic)
-            return 2 / Math.max(this.playerDeck[0],2);
-        if (! this.isThereEpidemic && this.playerDeck[0] >= 2)
-            return 0;
-        return 1 / this.playerDeck[1];
+    this.GetCityOddsNThenEpidemic = function (city, draws) {
+        var i,
+            bad = 0,
+            badBottom = 0,
+            indRem = this.GetStackIndexAndRemainder(draws),
+            dubts = this.deck[indRem.index].length,
+            dubtsBottom = this.deck[0].length;
+        for (i = indRem.index + 1; i < this.deck.length; i++) {
+            if (this.deck[i].indexOf(city) > -1)
+                return 0;
+        }
+        this.deck[indRem.index].forEach(function (item) {
+            if (item === city) { bad++; }
+        });
+        this.deck[0].forEach(function (item) {
+            if (item === city) { badBottom++; }
+        });
+        if (indRem.index === 0) {
+            indRem.remainder += 1;
+            return binom.get(dubts - bad, indRem.remainder) / binom.get(dubts, indRem.remainder);
+        }
+        else {
+            return binom.get(dubts - bad, indRem.remainder) / binom.get(dubts, indRem.remainder)
+                * (dubtsBottom - badBottom) / dubtsBottom;
+        }
+    }
+    this.GetStackIndexAndRemainderAfterEpidemic = function (cards, preDraws) {
+        var j = this.deck.length;
+        if (cards <= preDraws + this.discard.length + 1)
+            return {'index': j, 'remainder': cards};
+        else {
+            cards -= preDraws + this.discard.length + 1;
+            j -= 1;
+        }
+        while (cards > this.deck[j].length && j >= 0) {
+            cards -= this.deck[j].length;
+            j -= 1;
+        }
+        return {'index': j, 'remainder': cards};
+    };
+    this.GetCityOddsNAfterEpidemicEscaped = function (city, preDraws, postDraws) {
+        return 1;
+/*        var i,
+            bad = 0,
+            dubts,
+            indRem = this.GetStackIndexAndRemainderAfterEpidemic(postDraws, preDraws);
+        for (i = indRem.index + 1; i < this.deck.length; i++) {
+            if (this.deck[i].indexOf(city) > -1)
+                return 0;
+        }
+        if (indRem.index < this.deck.length) {
+            if (this.discard.indexOf(city) > -1)
+                return 0;
+            dubts = this.deck[indRem.index].length;
+            this.deck[indRem.index].forEach(function (item) {
+                if (item === city) { bad++; }
+            });
+        }
+        else {
+            dubts = this.discard.length + preDraws + 1;
+            this.discard.forEach(function (item) {
+                if (item === city) { bad++; }
+            });
+        }
+        return binom.get(dubts - bad, indRem.remainder) / binom.get(dubts, indRem.remainder);*/
+    }
+    this.GetNextEpidemicOdds = function (turnsBefore) {
+        var playerCards = 2,
+            i, odds = 0,
+            singleCardOdds = function (n) {
+                if (this.isThereEpidemic) {
+                    if (n > this.playerDeck[0])
+                        return 0;
+                    else
+                        return 1 / this.playerDeck[0];
+                }
+                else {
+                    if (n <= this.playerDeck[0] || n > this.playerDeck[0] + this.playerDeck[1])
+                        return 0;
+                    else
+                        return 1 / this.playerDeck[1];
+                }
+            };
+        for (i = 1; i <= playerCards; i++)
+            odds += singleCardOdds(turnsBefore * playerCards + i);
+        return odds;
+    }
+    this.GetEpidemicCityOdds = function (city, turns) {
+        var i, lmb,
+            odds = 0,
+            resEpidemic = 1;
+        for (i = 0; i < turns; i++) {
+            lmb = this.GetNextEpidemicOdds(i);
+            odds += lmb * (1 -
+                           this.GetCityOddsNThenEpidemic(city, i * this.infectRate[0]) *
+                           this.GetCityOddsNAfterEpidemicEscaped(city, i * this.infectRate[0], (turns - i) * this.infectRate[1])
+                          );
+            resEpidemic -= lmb;
+        }
+        odds += resEpidemic * (1 - this.GetCityOddsNever(city, turns * this.infectRate[0]));
+        return odds;
     }
 }
 
-var saveKeys = ["deck", "discard", "cities", "playerDeck",
+var saveKeys = ["deck", "infectCards", "discard", "cities", "playerDeck",
         "infectRate", "isThereEpidemic", "toInfect"];
 
 function SaveState(state) {
