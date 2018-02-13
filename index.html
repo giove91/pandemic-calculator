@@ -39,7 +39,7 @@
                                 'table-danger': x.color=='red',
                                 'table-warning': x.color=='yellow' }">
                     <td>
-                        <button type="button" ng-click="ClickCity(x.name)" class="btn btn-sm btn-outline-dark btn-block">
+                        <button type="button" ng-click="ClickCity(x.name, $event)" class="btn btn-sm btn-block" ng-class="epidemic ? 'btn-success' : 'btn-outline-dark'">
                             {{ x.name }}
                         </button>
                     </td>

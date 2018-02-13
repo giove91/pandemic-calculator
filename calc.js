@@ -239,10 +239,10 @@ function InitData($scope,data) {
     $scope.hist = [];
     $scope.epidemic = false;
     $scope.blockPlayerDeck = false;
-    $scope.ClickCity = function (city) {
+    $scope.ClickCity = function (city, $event) {
         $scope.blockPlayerDeck = true;
         $scope.hist.push(SaveState($scope.state));
-        if ($scope.epidemic) {
+        if ($scope.epidemic || $event.shiftKey) {
             $scope.state.Epidemic(city);
             $scope.epidemic = false;
         } else {
