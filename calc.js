@@ -52,7 +52,7 @@ function State(cities) {
         this.discard.sort();
         this.deck.push(this.discard);
         this.discard = [];
-        this.infectRate.shift();
+        if (this.infectRate.length > 1) this.infectRate.shift();
         this.isThereEpidemic = false;
     };
     this.InitPlayerDeck = function (playerCards, epidemicCards) {
