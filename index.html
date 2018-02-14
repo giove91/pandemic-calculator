@@ -86,7 +86,7 @@
             <h4>Infection deck</h4>
             <table class="table table-sm mb-0">
                 <tr ng-repeat="l in state.deck">
-                    <td>{{ l.length }}</td><td>{{ l.join(', ') }}</td>
+                    <td>{{ l.length }}</td><td>{{ l.slice().sort().join(', ') }}</td>
                 </tr>
             </table>
             <hr class="mt-0"/>
