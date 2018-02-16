@@ -1,5 +1,108 @@
 'use strict';
 
+function CityCalc() {
+    // the last is the discard pile
+    this.deck = [0, 0];
+    this.cdeck = [0, 0];
+    this.Copy = function () {
+        var cc = new CityCalc();
+        cc.deck = this.deck.slice();
+        cc.cdeck = this.cdeck.slice();
+        return cc;
+    };
+    this.SingleEventOdds = function (event, times) {
+        if (times < 0)
+            return 0;
+        // event = -1 means "Epidemic"
+        if (event === -1) {
+            if (times > 1)
+                return 0;
+            var odds = this.cdeck[0] / this.deck[0];
+            if (times === 1)
+                return odds;
+            else
+                return 1 - odds;
+        }
+        // event >= 0 means "Draw event cards"
+        var l = this.deck.length - 2;
+        if (event >= this.deck[l]) {
+            // there is no enough cards to draw
+            if (l === 0)
+                return 0;
+            var cc = this.Copy();
+            cc.deck.splice(l, 1);
+            cc.cdeck.splice(l, 1);
+            return cc.SingleEventOdds(event - this.deck[l], times - this.cdeck[l]);
+        }
+        // at most this.cdeck[l] or event cards can be drawn
+        if (times > this.cdeck[l] || times > event)
+            return 0;
+        // last simple case with binomial coefficients
+        return binom.get(this.deck[l] - this.cdeck[l], event - times) / binom.get(this.deck[l], event);
+    };
+    this.Change = function (event, times) {
+        if (times < 0)
+            return -1; // error
+        // event = -1 means "Epidemic"
+        if (event === -1) {
+            if (times > 1)
+                return -1; // error
+            if (this.cdeck[0] < times)
+                return -1; // error
+            
+            this.deck[0] -= 1;
+            this.cdeck[0] -= times;
+            var l = this.deck.length - 1;
+            this.deck[l] += 1;
+            this.cdeck[l] += times;
+            this.deck.push(0);
+            this.cdeck.push(0);
+            return 0; // no error
+        }
+        // event >= 0 means "Draw event cards"
+        var l = this.deck.length - 2;
+        if (event >= this.deck[l]) {
+            var pcards = this.deck[l],
+                ptimes = this.cdeck[l];
+            this.deck[l+1] += this.deck[l];
+            this.cdeck[l+1] += this.cdeck[l];
+            this.deck.splice(l,1);
+            this.cdeck.splice(l,1);
+            return this.Change(event - pcards, times - ptimes);
+        }
+        if (times > this.cdeck[l] || times > event)
+            return -1; // error
+        this.deck[l] -= event;
+        this.cdeck[l] -= times;
+        return 0; // no error
+    }
+    this.ListEventsOdds = function (eventList, times) {
+        var i,
+            odds = 0,
+            scc,
+            sodds;
+        // no events
+        if (eventList.length === 0) {
+            if (times === 0)
+                return 1;
+            return 0;
+        }
+        // single event
+        if (eventList.length === 1)
+            return this.SingleEventOdds(eventList[0], times);
+        // more events, recursion
+        for (i = 0; i < times; i++) {
+            sodds = this.SingleEventOdds(eventList[0],i);
+            if (sodds > 0) {
+                scc = this.Copy();
+                if (scc.Change(eventList[0],i) != 0)
+                    continue;
+                odds += sodds * scc.ListEventsOdds(eventList.slice(1, eventList.length), times - i);
+            }
+        }
+    }
+}
+
 function State(cities) {
     var i, j;
     this.discard = [];
