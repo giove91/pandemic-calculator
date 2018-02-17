@@ -58,8 +58,12 @@
             <div class="form-row">
                 <div class="col-auto">
                 <div class="form-check">
-                    <input type="checkbox" ng-model="epidemic" class="form-check-input" />
+                    <input type="checkbox" ng-model="epidemic" ng-click="inoculate = false" class="form-check-input" />
                     <label class="form-check-label">Epidemic mode</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" ng-model="inoculate" ng-click="epidemic = false" class="form-check-input" />
+                    <label class="form-check-label">Inoculate mode</label>
                 </div>
                 </div>
                 

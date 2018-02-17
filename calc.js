@@ -135,6 +135,7 @@ function State(cities) {
         var lastStack = this.deck.length - 1,
             index = this.deck[lastStack].indexOf(city);
         if (index === -1) {
+            console.log("Infect city not found", city);
             return "not found";
         }
         if (this.toInfect === 0) {
@@ -157,6 +158,7 @@ function State(cities) {
     this.Epidemic = function (city) {
         var index = this.deck[0].indexOf(city);
         if (index === -1) {
+            console.log("Epidemic city not found", city);
             return "not found";
         }
         this.deck[0].splice(index, 1);
@@ -170,6 +172,15 @@ function State(cities) {
         if (this.infectRate.length > 1) this.infectRate.shift();
         this.isThereEpidemic = false;
     };
+    // inoculate the city "city", if it appear in the discard pile
+    this.Inoculate = function (city) {
+        var index = this.discard.indexOf(city);
+        if (index === -1) {
+            console.log("Inoculate city not found", city);
+            return "not found";
+        }
+        this.discard.splice(index, 1);
+    }
     // initialize the player deck (for epidemic odds calculation)
     this.InitPlayerDeck = function (playerCards, epidemicCards) {
         var stack;
@@ -286,6 +297,8 @@ function InitData($scope,data) {
     $scope.hist = [];
     // if the next clicked city means "epidemic"
     $scope.epidemic = false;
+    // if the next clicked city means "inoculate"
+    $scope.inoculate = false;
     // if the player deck definition is blocked (which means that the game already started)
     $scope.blockPlayerDeck = false;
     // function called by clicking the cities buttons
@@ -295,6 +308,10 @@ function InitData($scope,data) {
         if ($scope.epidemic || $event.shiftKey) {
             $scope.state.Epidemic(city);
             $scope.epidemic = false;
+        } else
+        if ($scope.inoculate) {
+            $scope.state.Inoculate(city);
+            $scope.inoculate = false;
         } else {
             $scope.state.Infect(city);
         }
