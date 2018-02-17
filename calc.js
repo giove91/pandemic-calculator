@@ -1,5 +1,6 @@
 'use strict';
 
+// Object that helps odd calculation
 function CityCalc() {
     // the last is the discard pile
     this.deck = [];
@@ -86,7 +87,6 @@ function CityCalc() {
             odds = 0,
             scc,
             sodds;
-        // [DEBUG] console.log("events", this.deck, this.cdeck, eventList, times)
         // no events
         if (eventList.length === 0) {
             if (times === 0)
@@ -110,14 +110,16 @@ function CityCalc() {
     }
 }
 
+// Global state of the game
 function State(cities) {
+    // initialization
     var i, j;
     this.discard = [];
     this.deck = [[]];
     this.infectCards = 0;
     this.cities = [];
     this.playerDeck = [];
-    this.infectRate = [2, 2, 2, 3, 3, 4, 4];
+    this.infectRate = [2, 2, 2, 3, 3, 4, 4, 4];
     this.isThereEpidemic = true;
     this.toInfect = 9;
     for (i = 0; i < cities.length; i++) {
@@ -127,6 +129,7 @@ function State(cities) {
         }
         this.infectCards = this.deck[0].length;
     }
+    // infect the first city on the infect deck
     this.Infect = function (city) {
         var lastStack = this.deck.length - 1,
             index = this.deck[lastStack].indexOf(city);
@@ -149,6 +152,7 @@ function State(cities) {
         }
         this.discard.push(city);
     };
+    // infect the last city of the infect deck and add discard pile to the deck
     this.Epidemic = function (city) {
         var index = this.deck[0].indexOf(city);
         if (index === -1) {
@@ -165,6 +169,7 @@ function State(cities) {
         if (this.infectRate.length > 1) this.infectRate.shift();
         this.isThereEpidemic = false;
     };
+    // initialize the player deck (for epidemic odds calculation)
     this.InitPlayerDeck = function (playerCards, epidemicCards) {
         var stack;
         this.playerDeck = [];
@@ -175,6 +180,7 @@ function State(cities) {
             epidemicCards -= 1;
         }
     };
+    // get the simplified object CityCalc concerning the city "city"
     this.GetCityCalc = function (city) {
         var i,
             cc = new CityCalc(),
@@ -194,119 +200,7 @@ function State(cities) {
         cc.cdeck.push(tc);
         return cc;
     }
-/*    this.GetStackIndexAndRemainder = function (cards) {
-        var j = this.deck.length - 1;
-        while (cards > this.deck[j].length && j >= 0) {
-            cards -= this.deck[j].length;
-            j -= 1;
-        }
-        return {'index': j, 'remainder': cards};
-    };
-    this.GetCityOdds = function (cards, city, times) {
-        var i,
-            min = 0,
-            dev = 0,
-            oppOdds = 0,
-            indRem = this.GetStackIndexAndRemainder(cards),
-            rim = this.deck[indRem.index].length,
-            Counter = function (item) {
-                if (item === city) { min++; }
-            };
-        for (i = indRem.index + 1; i < this.deck.length; i++) {
-            this.deck[i].forEach(Counter);
-        }
-        if (times <= min) {
-            return 1;
-        }
-        times -= min;
-        this.deck[indRem.index].forEach(function (item) {
-            if (item === city) { dev++; }
-        });
-        for (i = 0; i < times; i++) {
-            oppOdds += binom.get(dev, i) * binom.get(rim - dev, indRem.remainder - i);
-        }
-        return 1 - oppOdds / binom.get(rim, indRem.remainder);
-    };
-    this.GetCityOddsNever = function (city, draws) {
-        var i,
-            bad = 0,
-            indRem = this.GetStackIndexAndRemainder(draws),
-            dubts = this.deck[indRem.index].length;
-        for (i = indRem.index + 1; i < this.deck.length; i++) {
-            if (this.deck[i].indexOf(city) > -1)
-                return 0;
-        }
-        this.deck[indRem.index].forEach(function (item) {
-            if (item === city) { bad++; }
-        });
-        return binom.get(dubts - bad, indRem.remainder) / binom.get(dubts, indRem.remainder);
-    }
-    this.GetCityOddsNThenEpidemic = function (city, draws) {
-        var i,
-            bad = 0,
-            badBottom = 0,
-            indRem = this.GetStackIndexAndRemainder(draws),
-            dubts = this.deck[indRem.index].length,
-            dubtsBottom = this.deck[0].length;
-        for (i = indRem.index + 1; i < this.deck.length; i++) {
-            if (this.deck[i].indexOf(city) > -1)
-                return 0;
-        }
-        this.deck[indRem.index].forEach(function (item) {
-            if (item === city) { bad++; }
-        });
-        this.deck[0].forEach(function (item) {
-            if (item === city) { badBottom++; }
-        });
-        if (indRem.index === 0) {
-            indRem.remainder += 1;
-            return binom.get(dubts - bad, indRem.remainder) / binom.get(dubts, indRem.remainder);
-        }
-        else {
-            return binom.get(dubts - bad, indRem.remainder) / binom.get(dubts, indRem.remainder)
-                * (dubtsBottom - badBottom) / dubtsBottom;
-        }
-    }
-    this.GetStackIndexAndRemainderAfterEpidemic = function (cards, preDraws) {
-        var j = this.deck.length;
-        if (cards <= preDraws + this.discard.length + 1)
-            return {'index': j, 'remainder': cards};
-        else {
-            cards -= preDraws + this.discard.length + 1;
-            j -= 1;
-        }
-        while (cards > this.deck[j].length && j >= 0) {
-            cards -= this.deck[j].length;
-            j -= 1;
-        }
-        return {'index': j, 'remainder': cards};
-    };
-    this.GetCityOddsNAfterEpidemicEscaped = function (city, preDraws, postDraws) {
-        return 1;*/
-/*        var i,
-            bad = 0,
-            dubts,
-            indRem = this.GetStackIndexAndRemainderAfterEpidemic(postDraws, preDraws);
-        for (i = indRem.index + 1; i < this.deck.length; i++) {
-            if (this.deck[i].indexOf(city) > -1)
-                return 0;
-        }
-        if (indRem.index < this.deck.length) {
-            if (this.discard.indexOf(city) > -1)
-                return 0;
-            dubts = this.deck[indRem.index].length;
-            this.deck[indRem.index].forEach(function (item) {
-                if (item === city) { bad++; }
-            });
-        }
-        else {
-            dubts = this.discard.length + preDraws + 1;
-            this.discard.forEach(function (item) {
-                if (item === city) { bad++; }
-            });
-        }
-        return binom.get(dubts - bad, indRem.remainder) / binom.get(dubts, indRem.remainder);*/
-//    }
+    // return the odds that the next epidemic happen after "turnsBefore" turns
     this.GetNextEpidemicOdds = function (turnsBefore) {
         var playerCards = 2,
             i, odds = 0,
@@ -328,6 +222,7 @@ function State(cities) {
             odds += singleCardOdds(turnsBefore * playerCards + i, this);
         return odds;
     }
+    // return the odds that the city "city" come out at least "times" times in the next "turns" turns supposing at most one epidemic can happen meantime
     this.GetEpidemicCityOdds = function (city, turns, times) {
         var i, j,
             lmb,
@@ -363,9 +258,9 @@ function State(cities) {
     }
 }
 
+// Save and Load functions
 var saveKeys = ["deck", "infectCards", "discard", "cities", "playerDeck",
         "infectRate", "isThereEpidemic", "toInfect"];
-
 function SaveState(state) {
     var save = {}, i;
     for (i = 0; i < saveKeys.length; i++)
@@ -380,12 +275,19 @@ function LoadState(state, save) {
 
 var app = angular.module('pandemic', []);
 
+// Initi function for the 'pandemic' angular app
+// data should contain the city cards description in the infection rate
 function InitData($scope,data) {
     $scope.cities = data;
+    // global game state
     $scope.state = new State($scope.cities);
+    // game state history
     $scope.hist = [];
+    // if the next clicked city means "epidemic"
     $scope.epidemic = false;
+    // if the player deck definition is blocked (which means that the game already started)
     $scope.blockPlayerDeck = false;
+    // function called by clicking the cities buttons
     $scope.ClickCity = function (city, $event) {
         $scope.blockPlayerDeck = true;
         $scope.hist.push(SaveState($scope.state));
@@ -396,40 +298,33 @@ function InitData($scope,data) {
             $scope.state.Infect(city);
         }
     };
+    // data to display
     $scope.GetGrid = function (name, turns, atleast) {
         return ($scope.state.GetEpidemicCityOdds(name, turns, atleast)).toFixed(2)
     }
+    // parameter with which order the table
     $scope.orderParameter = 'name';
+    // auxiliary function for table ordering
     $scope.OrderTable = function (city) {
         if (typeof $scope.orderParameter === 'object' && 'atleast' in $scope.orderParameter)
-            return [$scope.state.GetCityOdds($scope.orderParameter.turns * $scope.state.infectRate[0], city.name, $scope.orderParameter.atleast), city.name];
+            return [$scope.state.GetEpidemicCityOdds(city.name, $scope.orderParameter.turns, $scope.orderParameter.atleast), city.name];
         return [city.color, city.name];
     }
-    $scope.infectrate = 2;
-    $scope.undo = function () {
+    // undo the last draw
+    $scope.Undo = function () {
         LoadState($scope.state, $scope.hist.pop());
     };
-    $scope.playercards = 66;
-    $scope.epidemiccards = 8;
-    $scope.updateplayerdeck = function () {
+    // starting data for the player deck
+    $scope.playerCards = 66;
+    $scope.epidemicCards = 8;
+    $scope.UpdatePlayerDeck = function () {
         if ($scope.blockPlayerDeck) return;
-        $scope.state.InitPlayerDeck($scope.playercards, $scope.epidemiccards)
+        $scope.state.InitPlayerDeck($scope.playerCards, $scope.epidemicCards)
     }
-    $scope.updateplayerdeck();
-    
-/*  [DEBUG] Test case
-    var cccc = new CityCalc();
-    cccc.deck[0] = 4;
-    cccc.cdeck[0] = 2;
-    var elist = [1,-1,2,-1];
-    var I;
-    for (I = 0; I<=5; I++) {
-        console.log(" --- ", I, " --- ");
-        console.log(cccc.ListEventsOdds(elist,I));
-    }*/
+    $scope.UpdatePlayerDeck();
 }
 
-
+// angular app controller initialization
 app.controller('calculator', function ($scope, $http) {
     $http.get('https://uz.sns.it/~giove/pandemic/deck/').then(
         function (response) {
