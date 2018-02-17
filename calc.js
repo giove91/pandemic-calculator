@@ -2,8 +2,8 @@
 
 function CityCalc() {
     // the last is the discard pile
-    this.deck = [0, 0];
-    this.cdeck = [0, 0];
+    this.deck = [];
+    this.cdeck = [];
     this.Copy = function () {
         var cc = new CityCalc();
         cc.deck = this.deck.slice();
@@ -175,7 +175,26 @@ function State(cities) {
             epidemicCards -= 1;
         }
     };
-    this.GetStackIndexAndRemainder = function (cards) {
+    this.GetCityCalc = function (city) {
+        var i,
+            cc = new CityCalc(),
+            tc,
+            Counter = function (item) {
+                if (item === city) { tc++; }
+            };
+        for (i = 0; i < this.deck.length; i++) {
+            cc.deck.push(this.deck[i].length);
+            tc = 0;
+            this.deck[i].forEach(Counter);
+            cc.cdeck.push(tc);
+        }
+        cc.deck.push(this.discard.length);
+        tc = 0;
+        this.discard.forEach(Counter);
+        cc.cdeck.push(tc);
+        return cc;
+    }
+/*    this.GetStackIndexAndRemainder = function (cards) {
         var j = this.deck.length - 1;
         while (cards > this.deck[j].length && j >= 0) {
             cards -= this.deck[j].length;
@@ -263,7 +282,7 @@ function State(cities) {
         return {'index': j, 'remainder': cards};
     };
     this.GetCityOddsNAfterEpidemicEscaped = function (city, preDraws, postDraws) {
-        return 1;
+        return 1;*/
 /*        var i,
             bad = 0,
             dubts,
@@ -287,41 +306,59 @@ function State(cities) {
             });
         }
         return binom.get(dubts - bad, indRem.remainder) / binom.get(dubts, indRem.remainder);*/
-    }
+//    }
     this.GetNextEpidemicOdds = function (turnsBefore) {
         var playerCards = 2,
             i, odds = 0,
-            singleCardOdds = function (n) {
-                if (this.isThereEpidemic) {
-                    if (n > this.playerDeck[0])
+            singleCardOdds = function (n, st) {
+                if (st.isThereEpidemic) {
+                    if (n > st.playerDeck[0])
                         return 0;
                     else
-                        return 1 / this.playerDeck[0];
+                        return 1 / st.playerDeck[0];
                 }
                 else {
-                    if (n <= this.playerDeck[0] || n > this.playerDeck[0] + this.playerDeck[1])
+                    if (n <= st.playerDeck[0] || n > st.playerDeck[0] + st.playerDeck[1])
                         return 0;
                     else
-                        return 1 / this.playerDeck[1];
+                        return 1 / st.playerDeck[1];
                 }
             };
         for (i = 1; i <= playerCards; i++)
-            odds += singleCardOdds(turnsBefore * playerCards + i);
+            odds += singleCardOdds(turnsBefore * playerCards + i, this);
         return odds;
     }
-    this.GetEpidemicCityOdds = function (city, turns) {
-        var i, lmb,
+    this.GetEpidemicCityOdds = function (city, turns, times) {
+        var i, j,
+            lmb,
             odds = 0,
-            resEpidemic = 1;
+            oppodds,
+            resEpidemic = 1,
+            cc = this.GetCityCalc(city),
+            eventList;
         for (i = 0; i < turns; i++) {
+            // events list calculation
+            if (i === 0)
+                eventList = [-1, turns * this.infectRate[1]];
+            else
+                eventList = [i * this.infectRate[0], -1, (turns - i) * this.infectRate[1]];
+            // odds that this list is the case
             lmb = this.GetNextEpidemicOdds(i);
-            odds += lmb * (1 -
-                           this.GetCityOddsNThenEpidemic(city, i * this.infectRate[0]) *
-                           this.GetCityOddsNAfterEpidemicEscaped(city, i * this.infectRate[0], (turns - i) * this.infectRate[1])
-                          );
+            // odds that, with this list, city appear less than "times" times
+            oppodds = 0;
+            for (j = 0; j < times; j++)
+                oppodds += cc.ListEventsOdds(eventList, j);
+            // right odds
+            odds += lmb * (1 - oppodds);
+            // odds that neither this is the case
             resEpidemic -= lmb;
         }
-        odds += resEpidemic * (1 - this.GetCityOddsNever(city, turns * this.infectRate[0]));
+        // the remaining case: epidemic does not appear
+        eventList = [turns * this.infectRate[0]];
+        oppodds = 0;
+        for (j = 0; j < times; j++)
+            oppodds += cc.ListEventsOdds(eventList, j);
+        odds += resEpidemic * (1 - oppodds);
         return odds;
     }
 }
@@ -359,8 +396,8 @@ function InitData($scope,data) {
             $scope.state.Infect(city);
         }
     };
-    $scope.GetGrid = function (turns, atleast, name) {
-        return ($scope.state.GetCityOdds(turns * $scope.state.infectRate[0], name, atleast)).toFixed(2)
+    $scope.GetGrid = function (name, turns, atleast) {
+        return ($scope.state.GetEpidemicCityOdds(name, turns, atleast)).toFixed(2)
     }
     $scope.orderParameter = 'name';
     $scope.OrderTable = function (city) {
