@@ -40,10 +40,15 @@
                                 'table-danger': x.color=='red',
                                 'table-warning': x.color=='yellow' }">
                     <td>
-                        <button type="button" ng-click="ClickCity(x.name, $event)" class="btn btn-sm btn-block" ng-class="epidemic ? 'btn-success' : 'btn-outline-dark'">
+                        <button type="button" ng-click="ClickCity(x.name, $event)" class="btn btn-sm btn-block"
+                                ng-class="epidemic ? 'btn-success' : inoculate ? 'btn-secondary' : 'btn-outline-dark'">
                             {{ x.name }}
                         </button>
                     </td>
+                    <!--
+                    <td ng-repeat="val in [(1,1), (2,1), (3,1), (4,1), (1,2), (2,2), (3,2), (4,2)]"
+                        ng-class="{'text-muted': GetGrid(val[0],val[1],x.name) < 0.5}">{{ GetGrid(val[0],val[1],x.name) }}</td>
+                    -->
                     <td>{{ GetGrid(x.name,1,1) }}</td>
                     <td>{{ GetGrid(x.name,2,1) }}</td>
                     <td>{{ GetGrid(x.name,3,1) }}</td>
@@ -57,11 +62,11 @@
             
             <div class="form-row">
                 <div class="col-auto">
-                <div class="form-check">
+                <div class="form-check" title="Shift+click">
                     <input type="checkbox" ng-model="epidemic" ng-click="inoculate = false" class="form-check-input" />
                     <label class="form-check-label">Epidemic mode</label>
                 </div>
-                <div class="form-check">
+                <div class="form-check" title="Ctrl+click">
                     <input type="checkbox" ng-model="inoculate" ng-click="epidemic = false" class="form-check-input" />
                     <label class="form-check-label">Inoculate mode</label>
                 </div>

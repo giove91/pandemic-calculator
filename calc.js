@@ -309,7 +309,7 @@ function InitData($scope,data) {
             $scope.state.Epidemic(city);
             $scope.epidemic = false;
         } else
-        if ($scope.inoculate) {
+        if ($scope.inoculate || $event.ctrlKey) {
             $scope.state.Inoculate(city);
             $scope.inoculate = false;
         } else {
