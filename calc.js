@@ -44,6 +44,7 @@ function CityCalc() {
             / binom.get(this.deck[l], event);
     };
     this.Change = function (event, times) {
+        var l;
         if (times < 0)
             return -1; // error
         // event = -1 means "Epidemic"
@@ -55,7 +56,7 @@ function CityCalc() {
             
             this.deck[0] -= 1;
             this.cdeck[0] -= times;
-            var l = this.deck.length - 1;
+            l = this.deck.length - 1;
             this.deck[l] += 1;
             this.cdeck[l] += times;
             this.deck.push(0);
@@ -63,7 +64,7 @@ function CityCalc() {
             return 0; // no error
         }
         // event >= 0 means "Draw event cards"
-        var l = this.deck.length - 2;
+        l = this.deck.length - 2;
         if (event >= this.deck[l]) {
             var pcards = this.deck[l],
                 ptimes = this.cdeck[l];
@@ -304,6 +305,15 @@ function InitData($scope,data) {
     }
     // parameter with which order the table
     $scope.orderParameter = 'name';
+    $scope.reverseOrder = false;
+    // set parameter function
+    $scope.SetOrderParameter = function (al, t) {
+        if (typeof $scope.orderParameter === 'object'
+            && $scope.orderParameter['atleast'] === al
+            && $scope.orderParameter['turns'] === t)
+            $scope.reverseOrder = ! $scope.reverseOrder;
+        $scope.orderParameter = {atleast: al, turns: t};
+    }
     // auxiliary function for table ordering
     $scope.OrderTable = function (city) {
         if (typeof $scope.orderParameter === 'object' && 'atleast' in $scope.orderParameter)
