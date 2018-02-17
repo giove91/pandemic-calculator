@@ -38,7 +38,9 @@ function CityCalc() {
         if (times > this.cdeck[l] || times > event)
             return 0;
         // last simple case with binomial coefficients
-        return binom.get(this.deck[l] - this.cdeck[l], event - times) / binom.get(this.deck[l], event);
+        return binom.get(this.deck[l] - this.cdeck[l], event - times)
+            * binom.get(this.cdeck[l], times)
+            / binom.get(this.deck[l], event);
     };
     this.Change = function (event, times) {
         if (times < 0)
@@ -72,6 +74,9 @@ function CityCalc() {
         }
         if (times > this.cdeck[l] || times > event)
             return -1; // error
+        
+        this.deck[l+1] += event;
+        this.cdeck[l+1] += times;
         this.deck[l] -= event;
         this.cdeck[l] -= times;
         return 0; // no error
@@ -81,6 +86,7 @@ function CityCalc() {
             odds = 0,
             scc,
             sodds;
+        // [DEBUG] console.log("events", this.deck, this.cdeck, eventList, times)
         // no events
         if (eventList.length === 0) {
             if (times === 0)
@@ -91,8 +97,8 @@ function CityCalc() {
         if (eventList.length === 1)
             return this.SingleEventOdds(eventList[0], times);
         // more events, recursion
-        for (i = 0; i < times; i++) {
-            sodds = this.SingleEventOdds(eventList[0],i);
+        for (i = 0; i <= times; i++) {
+            sodds = this.SingleEventOdds(eventList[0], i);
             if (sodds > 0) {
                 scc = this.Copy();
                 if (scc.Change(eventList[0],i) != 0)
@@ -100,6 +106,7 @@ function CityCalc() {
                 odds += sodds * scc.ListEventsOdds(eventList.slice(1, eventList.length), times - i);
             }
         }
+        return odds;
     }
 }
 
@@ -372,6 +379,17 @@ function InitData($scope,data) {
         $scope.state.InitPlayerDeck($scope.playercards, $scope.epidemiccards)
     }
     $scope.updateplayerdeck();
+    
+/*  [DEBUG] Test case
+    var cccc = new CityCalc();
+    cccc.deck[0] = 4;
+    cccc.cdeck[0] = 2;
+    var elist = [1,-1,2,-1];
+    var I;
+    for (I = 0; I<=5; I++) {
+        console.log(" --- ", I, " --- ");
+        console.log(cccc.ListEventsOdds(elist,I));
+    }*/
 }
 
 
