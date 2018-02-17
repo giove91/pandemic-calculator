@@ -120,7 +120,7 @@ function State(cities) {
     this.infectCards = 0;
     this.cities = [];
     this.playerDeck = [];
-    this.infectRate = [2, 2, 2, 3, 3, 4, 4, 4];
+    this.infectRate = [2, 2, 2, 3, 3, 4, 4, 5, 5];
     this.isThereEpidemic = true;
     this.toInfect = 9;
     for (i = 0; i < cities.length; i++) {
