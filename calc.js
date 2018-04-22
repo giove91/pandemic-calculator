@@ -187,7 +187,7 @@ function State(cities) {
         this.playerDeck = [];
         while (epidemicCards > 0) {
             stack = Math.ceil(playerCards / epidemicCards);
-            this.playerDeck.push(stack + 1);
+            this.playerDeck.push(stack);
             playerCards -= stack;
             epidemicCards -= 1;
         }
@@ -342,8 +342,8 @@ function InitData($scope,data) {
         LoadState($scope.state, $scope.hist.pop());
     };
     // starting data for the player deck
-    $scope.playerCards = 66;
-    $scope.epidemicCards = 8;
+    $scope.playerCards = 51;
+    $scope.epidemicCards = 5;
     $scope.UpdatePlayerDeck = function () {
         if ($scope.blockPlayerDeck) return;
         $scope.state.InitPlayerDeck($scope.playerCards, $scope.epidemicCards)
@@ -359,7 +359,7 @@ app.controller('calculator', function ($scope, $http) {
         }
     ).catch(
         function () {
-            InitData($scope,[{"color": "blue", "multiplicity": 3, "name": "New York"}, {"color": "blue", "multiplicity": 2, "name": "Paris"}, {"color": "blue", "multiplicity": 2, "name": "San Francisco"}, {"color": "blue", "multiplicity": 3, "name": "Washington"}, {"color": "black", "multiplicity": 3, "name": "Cairo"}, {"color": "black", "multiplicity": 3, "name": "Istanbul"}, {"color": "black", "multiplicity": 3, "name": "Tripoli"}, {"color": "yellow", "multiplicity": 2, "name": "Bogot\u00e0"}]);
+            InitData($scope,[{"color": "blue", "multiplicity": 3, "name": "London"}, {"color": "blue", "multiplicity": 3, "name": "New York"},  {"color": "blue", "multiplicity": 3, "name": "Washington"}, {"color": "black", "multiplicity": 3, "name": "Cairo"}, {"color": "black", "multiplicity": 3, "name": "Istanbul"}, {"color": "black", "multiplicity": 3, "name": "Tripoli"}, {"color": "yellow", "multiplicity": 3, "name": "Jacksonville"}, {"color": "yellow", "multiplicity": 3, "name": "Lagos"}, {"color": "yellow", "multiplicity": 3, "name": "S\u00E3o Paulo"}]);
         }
     );
 });
