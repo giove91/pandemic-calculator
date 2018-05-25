@@ -93,9 +93,10 @@
             
             <h4>Infection deck</h4>
             <table class="table table-sm mb-0">
-                <tr ng-repeat="l in state.deck">
+                <tr ng-repeat="l in state.deck.slice(0).reverse()">
                     <td>{{ l.length }}</td><td>{{ l.slice().sort().join(', ') }}</td>
                 </tr>
+				<tr><td colspan="2"><h5>Discard pile</h5></td></tr>
                 <tr class="mt-0">
                     <td>{{ state.discard.length }}</td><td>{{ state.discard.slice().sort().join(', ') }}</td>
                 </tr>
