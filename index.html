@@ -103,8 +103,13 @@
             <hr class="mt-0"/>
             
             <p>infectRate: {{ state.infectRate }}</p>
-			<p>playerDeck: {{ state.playerDeck }}<button type="button" ng-click="DiscardPlayerCard()" class="btn">Discard player card</button><button type="button" ng-click="AddPlayerCard()" class="btn">Add player card</button></p>
-			<p><label>isThereEpidemic: <input type="checkbox" ng-model="state.isThereEpidemic"></label></p>
+			<p class="form-row">playerDeck: {{ state.playerDeck }}
+				<span type="px-3"><button type="button" ng-click="DiscardPlayerCard()" class="btn btn-outline-info">Discard player card</button></span>
+				<span type="pb-5"><button type="button" ng-click="AddPlayerCard()" class="btn btn-outline-info">Add player card</button></span>
+			</p>
+			<p class="form-check form-check-inline"><label>isThereEpidemic:
+				<input type="checkbox" ng-model="state.isThereEpidemic" class="form-check-input"></label>
+			</p>
             <p>toInfect: {{ state.toInfect }}</p>
         </div>
         
