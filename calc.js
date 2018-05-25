@@ -349,6 +349,15 @@ function InitData($scope,data) {
         $scope.state.InitPlayerDeck($scope.playerCards, $scope.epidemicCards)
     }
     $scope.UpdatePlayerDeck();
+	$scope.AddPlayerCard = function () {
+		$scope.state.playerDeck[0] += 1;
+	};
+	$scope.DiscardPlayerCard = function () {
+		$scope.state.playerDeck[0] -= 1;
+		if ($scope.state.playerDeck[0] === 0) {
+			$scope.state.playerDeck.shift();
+		}
+	};
 }
 
 // angular app controller initialization
