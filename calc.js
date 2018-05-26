@@ -19,13 +19,13 @@ function CityCalc() {
             if (times > 1)
                 return 0;
 			/* old Epidemic
-            var odds = this.cdeck[0] / this.deck[0];
+            var odds = this.cdeck[0] / this.deck[0];*/
+			// new Epidemic
+			var odds = 0;
             if (times === 1)
                 return odds;
             else
                 return 1 - odds;
-			*/
-			// new Epidemic
 			return 0;
         }
         // event >= 0 means "Draw event cards"
