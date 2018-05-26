@@ -18,11 +18,15 @@ function CityCalc() {
         if (event === -1) {
             if (times > 1)
                 return 0;
+			/* old Epidemic
             var odds = this.cdeck[0] / this.deck[0];
             if (times === 1)
                 return odds;
             else
                 return 1 - odds;
+			*/
+			// new Epidemic
+			return 0;
         }
         // event >= 0 means "Draw event cards"
         var l = this.deck.length - 2;
@@ -54,8 +58,13 @@ function CityCalc() {
             if (this.cdeck[0] < times)
                 return -1; // error
             
+			/* old Epidemic
             this.deck[0] -= 1;
             this.cdeck[0] -= times;
+			*/
+			// new Epidemic
+			/* nothing else */
+			
             l = this.deck.length - 1;
             this.deck[l] += 1;
             this.cdeck[l] += times;
@@ -156,7 +165,8 @@ function State(cities) {
     };
     // infect the last city of the infect deck and add discard pile to the deck
     this.Epidemic = function (city) {
-        var index = this.deck[0].indexOf(city);
+        /*
+		var index = this.deck[0].indexOf(city);
         if (index === -1) {
             console.log("Epidemic city not found", city);
             return "not found";
@@ -165,6 +175,7 @@ function State(cities) {
         if (this.deck[0].length === 0) {
             this.deck.shift();
         }
+		*/
         this.discard.push(city);
         this.discard.sort();
         this.deck.push(this.discard);
